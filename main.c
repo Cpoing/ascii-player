@@ -4,8 +4,13 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
-int main()
+int main(int argc, char *argv[])
 {
+  if (argc < 2) {
+    fprintf(stderr, "Usage %s <video>\n", argv[0]);
+    return 1;
+  }
+  char *input = argv[1];
   const char ASCII_RAMP[] = " .:-=+*#%@";
   const int ASCII_RAMP_LEN = strlen(ASCII_RAMP);
 
@@ -15,9 +20,9 @@ int main()
   int h = ws.ws_row;
   char cmd[256];
   snprintf(cmd, sizeof(cmd),
-      "ffmpeg -i drift.mp4 -vf scale=%d:%d "
+      "ffmpeg -i %s -vf scale=%d:%d "
       "-f rawvideo -pix_fmt rgb24 -r 24 "
-      "-loglevel quiet pipe:1", w, h);
+      "-loglevel quiet pipe:1", input, w, h);
 
   FILE *pipe = popen(cmd, "r");
   if (!pipe) { perror("popen"); return 1;}
